@@ -1,0 +1,85 @@
+server:
+  port: 6029
+
+spring:
+  application:
+    name: hzhGatewayServer
+  cloud:
+    nacos:
+      server-addr: 192.168.195.135:8848 # Nacos服务地址
+      discovery:
+        namespace: 17a0dd42-12bf-4036-9a4f-86496210b6c1 # 命名空间ID
+        ephemeral: false # 是否为临时实例
+      config:
+        namespace: 17a0dd42-12bf-4036-9a4f-86496210b6c1 # 配置命名空间ID
+        group: HZH-GATEWAY # 配置分组
+        cluster: config # 配置集群名称
+        isGlobal: false # 是否为全局配置
+      watch:
+        namespace: 17a0dd42-12bf-4036-9a4f-86496210b6c1 # 监控命名空间ID
+        group: HZH-GATEWAY # 监控分组
+        cluster: config # 监控集群名称
+      load-balance:
+        algorithm: round_robin # 负载均衡算法，这里使用轮询算法
+      heartbeat:
+        enabled: true # 是否开启心跳检测功能
+        interval: 30000 # 心跳检测间隔时间，单位为毫秒
+        timeout: 10000 # 心跳超时时间，单位为毫秒
+      logging:
+        level: INFO # 日志级别，这里设置为INFO级别
+    gateway:
+      # 保证服务名与各模块服务名一致
+      routes:
+        - id: hzhUserServer # 路由标示，必须唯一
+          uri: lb://hzhUserServer # 路由的目标地址 服务名称前缀 lb:
+          predicates: # 路由断言，判断请求是否符合规则
+            - Path=/hzh-user/** # 路径断言，判断路径是否是以/user开头，如果是则符合
+
+        - id: hzhCenterServer # 路由标示，必须唯一
+          uri: lb://hzhCenterServer # 路由的目标地址 服务名称前缀 lb:
+          predicates: # 路由断言，判断请求是否符合规则
+            - Path=/hzh-center/** # 路径断言，判断路径是否是以/center开头，如果是则符合
+
+        - id: hzhEventServer # 路由标示，必须唯一
+          uri: lb://hzhEventServer # 路由的目标地址 服务名称前缀 lb:
+          predicates: # 路由断言，判断请求是否符合规则
+            - Path=/hzh-event/**  # 路径断言，判断路径是否是以/event开头，如果是则符合
+
+        - id: hzhTeamServer # 路由标示，必须唯一
+          uri: lb://hzhTeamServer # 路由的目标地址 服务名称前缀 lb:
+          predicates: # 路由断言，判断请求是否符合规则
+            - Path=/hzh-team/** # 路径断言，判断路径是否是以/team开头，如果是则符合
+            #时间断言  在2037年以后才可以访问
+            #- After=2037-01-20T17:42:47.789-07:00[America/Denver]
+
+        - id: hzhOrderServer
+          uri: lb://hzhOrderServer
+          predicates:
+            - Path=/hzh-order/**
+            # 配置在order-service 下只对该服务生效
+            #- AddRequestHeader=Truth,hzh is freaking awesome!
+      #请求头过滤器  30多种过滤器
+      #default-filters:  #过滤器Truth 是key，后面是value  配置在routes：下对全局生效
+      #  - AddRequestHeader=Truth,hzh is freaking awesome!
+        - id: hzhTestServer
+          uri: lb://hzhTestServer
+          predicates:
+            - Path=/hzh-test/**
+
+      globalcors: # 全局的跨域处理  在gateway 下一级
+        add-to-simple-url-handler-mapping: true # 解决options请求被拦截问题
+        corsConfigurations:
+          '[/**]': #/** 拦截一切请求，凡是进入getaway的请求都拦截
+            allowedOrigins: # 允许哪些网站的跨域请求
+              - "http://localhost:8090"
+              - "http://www.baidu.com"
+            allowedMethods: # 允许的跨域ajax的请求方式
+              - "GET"
+              - "POST"
+              - "DELETE"
+              - "PUT"
+              - "OPTIONS"
+            allowedHeaders: "*" # 允许在请求中携带的头信息
+            allowCredentials: true # 是否允许携带cookie
+            maxAge: 360000 # 这次跨域检测的有效期
+
