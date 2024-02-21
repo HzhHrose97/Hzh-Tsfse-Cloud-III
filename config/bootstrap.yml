@@ -6,17 +6,17 @@ spring:
     name: hzhGatewayServer
   cloud:
     nacos:
-      server-addr: 192.168.195.135:8848 # Nacos服务地址
+      server-addr: 192.168.65.131:8848 # Nacos服务地址
       discovery:
-        namespace: 17a0dd42-12bf-4036-9a4f-86496210b6c1 # 命名空间ID
+        namespace: 45155062-31ae-4400-a240-6e1de3030660 # 命名空间ID
         ephemeral: false # 是否为临时实例
       config:
-        namespace: 17a0dd42-12bf-4036-9a4f-86496210b6c1 # 配置命名空间ID
+        namespace: 45155062-31ae-4400-a240-6e1de3030660 # 配置命名空间ID
         group: HZH-GATEWAY # 配置分组
         cluster: config # 配置集群名称
         isGlobal: false # 是否为全局配置
       watch:
-        namespace: 17a0dd42-12bf-4036-9a4f-86496210b6c1 # 监控命名空间ID
+        namespace: 45155062-31ae-4400-a240-6e1de3030660 # 监控命名空间ID
         group: HZH-GATEWAY # 监控分组
         cluster: config # 监控集群名称
       load-balance:
